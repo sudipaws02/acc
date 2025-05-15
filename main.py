@@ -10,45 +10,67 @@ from mapper.validator import load_filter_config, validate_fields
 def main():
     start_time = time.perf_counter()
     tracemalloc.start()
-
-    args = parse_cli_args()
-
-    if args.billing_type != "EA":
-        print(f"Billing type '{args.billing_type}' is not supported yet.")
-        sys.exit(1)
+    memory_snapshots = []
 
     try:
+        print("[TASK] Parsing CLI arguments...")
+        args = parse_cli_args()
+        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+
+        print("[TASK] Reading input CSV...")
         df = read_input_csv(args.input_file)
-    except Exception as e:
-        print(f"Failed to read input file: {e}")
-        sys.exit(1)
+        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
 
-    column_map = load_column_map("config/column_map.yaml")
-    df_mapped = map_columns(df, column_map)
-    filter_config = load_filter_config("config/ea_filters.yaml")
+        print("[TASK] Loading column mappings...")
+        column_map = load_column_map(args.column_map)
+        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
 
-    try:
+        print("[TASK] Mapping columns to standard Azure fields...")
+        mapped_df = map_columns(df, column_map)
+        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+
+        print("[TASK] Loading filter configuration...")
+        filter_config_path = f"config/{args.billing_type.lower()}_filters.yaml"
+        filter_config = load_filter_config(filter_config_path)
+        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+
+        print("[TASK] Validating input fields based on strategy...")
+        mapped_columns = mapped_df.columns.tolist()
         validate_fields(
-            columns=df_mapped.columns.tolist(),
+            columns=mapped_columns,
             strategy=args.filter_strategy,
             custom_fields=args.custom_fields,
             filter_config=filter_config
         )
-    except ValueError as e:
-        print(f"Validation failed: {e}")
+        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+
+        print("[TASK] Generating output filename...")
+        output_file = generate_output_filename(billing_type=args.billing_type)
+        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+
+        print("[TASK] Writing mapped data to output file...")
+        mapped_df.to_csv(output_file, index=False)
+        print(f"[SUCCESS] Output written to: {output_file}")
+        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+
+    except ValueError as ve:
+        print(str(ve))
         sys.exit(1)
 
-    output_file = generate_output_filename()
-    df_mapped.to_csv(output_file, index=False)
-    print(f"Mapped CSV saved as: {output_file}")
+    except Exception as e:
+        print(f"[FATAL] Unexpected error: {e}")
+        sys.exit(1)
 
-    current, peak = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
-    end_time = time.perf_counter()
+    finally:
+        end_time = time.perf_counter()
+        current, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
 
-    print(f"Execution time: {end_time - start_time:.4f} seconds")
-    print(f"Current memory usage: {current / 1024:.2f} KB")
-    print(f"Peak memory usage: {peak / 1024:.2f} KB")
+        average_memory = sum(memory_snapshots) / len(memory_snapshots) if memory_snapshots else 0
+
+        print("\n[METRICS] Execution Time      :", f"{end_time - start_time:.2f} seconds")
+        print("[METRICS] Peak Memory Usage   :", f"{peak / 1024 / 1024:.2f} MB")
+        print("[METRICS] Average Memory Usage:", f"{average_memory / 1024 / 1024:.2f} MB")
 
 if __name__ == "__main__":
     main()
