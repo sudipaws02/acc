@@ -1,0 +1,4 @@
+sku_id,region_name,pricing_type,consumed_quantity,currency_code,service_name,meter_name
+sku-abc,US East,Reservation,100,USD,Virtual Machines,Standard A1
+sku-def,US West,OnDemand,50,USD,Storage,Premium LRS
+sku-ghi,US East,Reservation,200,USD,SQL Database,Standard S2

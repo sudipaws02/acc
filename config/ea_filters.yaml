@@ -1,0 +1,25 @@
+all_filters:
+  - armRegionName
+  - Location
+  - meterId
+  - meterName
+  - productId
+  - skuId
+  - productName
+  - skuName
+  - serviceName
+  - serviceId
+  - serviceFamily
+  - priceType
+  - armSkuName
+  - consumedQuantity
+
+recommended_filters:
+  - productId
+  - skuId
+  - Location
+  - priceType
+
+mandatory_filters:
+  - Location
+  - priceType

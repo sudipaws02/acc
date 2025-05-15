@@ -1,0 +1,9 @@
+column_mapping:
+  productId: product_id
+  skuId: sku_id
+  Location: region_name
+  priceType: pricing_type
+  consumedQuantity: consumed_quantity
+  currencyCode: currency_code
+  serviceName: service_name
+  meterName: meter_name
