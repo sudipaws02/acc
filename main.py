@@ -1,76 +1,69 @@
-import sys
 import time
 import tracemalloc
+import pandas as pd
 
-from input_handler.cli_args import parse_cli_args
-from input_handler.file_utils import read_input_csv, generate_output_filename
+from config.cli_args import parse_cli_args
+from config.file_utils import read_input_csv, generate_output_filename
 from mapper.column_mapper import load_column_map, map_columns
 from mapper.validator import load_filter_config, validate_fields
+from enricher.enrich_data import enrich_data
+
 
 def main():
-    start_time = time.perf_counter()
+    # Start timers and memory tracking
     tracemalloc.start()
-    memory_snapshots = []
+    start_time = time.time()
 
-    try:
-        print("[TASK] Parsing CLI arguments...")
-        args = parse_cli_args()
-        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+    print("[TASK] Parsing CLI arguments")
+    args = parse_cli_args()
 
-        print("[TASK] Reading input CSV...")
-        df = read_input_csv(args.input_file)
-        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+    print("[TASK] Reading input CSV")
+    df = read_input_csv(args.input_file)
 
-        print("[TASK] Loading column mappings...")
-        column_map = load_column_map(args.column_map)
-        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+    print("[TASK] Loading column map and mapping columns")
+    column_map = load_column_map(args.column_map)
+    df_mapped = map_columns(df, column_map)
 
-        print("[TASK] Mapping columns to standard Azure fields...")
-        mapped_df = map_columns(df, column_map)
-        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+    print("[TASK] Validating mapped fields")
+    filter_config = load_filter_config(args.filter_config)
+    mapped_columns = df_mapped.columns.tolist()
 
-        print("[TASK] Loading filter configuration...")
-        filter_config_path = f"config/{args.billing_type.lower()}_filters.yaml"
-        filter_config = load_filter_config(filter_config_path)
-        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+    validate_fields(
+        columns=mapped_columns,
+        strategy=args.filter_strategy,
+        custom_fields=args.custom_fields,
+        filter_config=filter_config
+    )
 
-        print("[TASK] Validating input fields based on strategy...")
-        mapped_columns = mapped_df.columns.tolist()
-        validate_fields(
-            columns=mapped_columns,
-            strategy=args.filter_strategy,
-            custom_fields=args.custom_fields,
-            filter_config=filter_config
-        )
-        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+    # Determine which fields to use for API filtering
+    if args.filter_strategy == "recommended":
+        field_keys = filter_config["recommended_filters"]
+    else:
+        field_keys = args.custom_fields
 
-        print("[TASK] Generating output filename...")
-        output_file = generate_output_filename(billing_type=args.billing_type)
-        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+    print("[TASK] Enriching data via Azure Retail Prices API")
+    enriched_df, ambiguous_df = enrich_data(df_mapped, field_keys)
 
-        print("[TASK] Writing mapped data to output file...")
-        mapped_df.to_csv(output_file, index=False)
-        print(f"[SUCCESS] Output written to: {output_file}")
-        memory_snapshots.append(tracemalloc.get_traced_memory()[1])
+    print("[TASK] Writing enriched output")
+    output_file = generate_output_filename(billing_type=args.billing_type)
+    enriched_df.to_csv(output_file, index=False)
 
-    except ValueError as ve:
-        print(str(ve))
-        sys.exit(1)
+    if not ambiguous_df.empty:
+        ambiguous_output_file = output_file.replace(".csv", "_ambiguous.csv")
+        ambiguous_df.to_csv(ambiguous_output_file, index=False)
+        print(f"[INFO] Ambiguous records written to: {ambiguous_output_file}")
 
-    except Exception as e:
-        print(f"[FATAL] Unexpected error: {e}")
-        sys.exit(1)
+    # Time and memory stats
+    end_time = time.time()
+    _, peak_memory = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
 
-    finally:
-        end_time = time.perf_counter()
-        current, peak = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
+    print(f"[SUMMARY] Total Time Taken: {round(end_time - start_time, 2)} seconds")
+    print(f"[SUMMARY] Peak Memory Usage: {round(peak_memory / (1024 * 1024), 2)} MB")
+    print(f"[SUMMARY] Total Records Processed: {len(df_mapped)}")
+    print(f"[SUMMARY] Enriched Records: {len(enriched_df)}")
+    print(f"[SUMMARY] Ambiguous Records: {len(ambiguous_df)}")
 
-        average_memory = sum(memory_snapshots) / len(memory_snapshots) if memory_snapshots else 0
-
-        print("\n[METRICS] Execution Time      :", f"{end_time - start_time:.2f} seconds")
-        print("[METRICS] Peak Memory Usage   :", f"{peak / 1024 / 1024:.2f} MB")
-        print("[METRICS] Average Memory Usage:", f"{average_memory / 1024 / 1024:.2f} MB")
 
 if __name__ == "__main__":
     main()
