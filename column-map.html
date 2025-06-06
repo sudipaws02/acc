@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Column Mapping{% endblock %}
+{% block content %}
+<h2>Step 2: Column Mapping</h2>
+<p class="description">Map each column from your uploaded billing file to one of the Azure Pricing API filter fields. If a column does not match, select "Custom" or retain the original name.</p>
+<form action="/filter-fields" method="post">
+  <table class="compact-table">
+    <thead>
+      <tr>
+        <th>Column Name</th>
+        <th>Map To</th>
+        <th>Keep Original?</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in range(1, 7) %}
+      <tr>
+        <td>Column{{ i }}</td>
+        <td>
+          <select name="mapping{{ i }}" onchange="toggleCustomInput(this, {{ i }})">
+            <option value="">-- Select --</option>
+            <option value="productId">productId</option>
+            <option value="skuId">skuId</option>
+            <option value="armRegionName">armRegionName</option>
+            <option value="productName">productName</option>
+            <option value="skuName">skuName</option>
+            <option value="serviceName">serviceName</option>
+            <option value="meterId">meterId</option>
+            <option value="meterName">meterName</option>
+            <option value="location">location</option>
+            <option value="armSkuName">armSkuName</option>
+            <option value="serviceFamily">serviceFamily</option>
+            <option value="serviceId">serviceId</option>
+            <option value="Custom">Custom</option>
+          </select>
+        </td>
+        <td>
+  <div>
+    <label><input type="checkbox" name="keep{{ i }}"> Keep Original</label><br>
+    <input type="text" name="custom{{ i }}" id="custom{{ i }}" placeholder="Enter custom name"
+           style="display:none; margin-top: 4px; width: 90%;" />
+  </div>
+</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="navigation-buttons align-right">
+    <a href="/" class="button previous">Previous</a>
+    <button type="submit" class="button">Next</button>
+  </div>
+</form>
+<h3>Sample Input Preview</h3>
+<table class="compact-table">
+  <thead>
+    <tr><th>Column A</th><th>Column B</th><th>Column C</th><th>Column D</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>data1</td><td>value1</td><td>info1</td><td>extra1</td></tr>
+    <tr><td>data2</td><td>value2</td><td>info2</td><td>extra2</td></tr>
+    <tr><td>data3</td><td>value3</td><td>info3</td><td>extra3</td></tr>
+  </tbody>
+</table>
+<script>
+function toggleCustomInput(selectElement, rowIndex) {
+  const customInput = document.getElementById(`custom${rowIndex}`);
+  if (selectElement.value === 'Custom') {
+    customInput.style.display = 'block';
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = '';
+  }
+}
+</script>
+{% endblock %}
+{% block info %}
+<h3>Column Mapping Details</h3>
+<p>This step helps ensure that your billing data fields are correctly aligned with the Azure API filters, which improves accuracy in API enrichment.</p>
+{% endblock %}

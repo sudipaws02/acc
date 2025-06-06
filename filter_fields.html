@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Filter Fields{% endblock %}
+{% block content %}
+<h2>Step 3: Filter Fields Selection</h2>
+<p class="description">Select which fields to use as filters when querying the Azure Pricing API. The more precise the selection, the better the match.</p>
+<form action="/run-specs" method="post">
+  <ul>
+    <li><input type="checkbox" name="filters" value="productId"> productId</li>
+    <li><input type="checkbox" name="filters" value="skuId"> skuId</li>
+    <li><input type="checkbox" name="filters" value="armRegionName"> armRegionName</li>
+    <li><input type="checkbox" name="filters" value="priceType"> priceType</li>
+  </ul>
+  <div class="navigation-buttons align-right">
+    <a href="/column-map" class="button previous">Previous</a>
+    <button type="submit">Next</button>
+  </div>
+</form>
+{% endblock %}
+{% block info %}
+<h3>Filter Field Guidance</h3>
+<p>Choosing the right filters narrows down the Azure pricing API response, improving performance and accuracy of price matches.</p>
+{% endblock %}

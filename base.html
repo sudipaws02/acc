@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Azure Billing Processor{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style1.css') }}">
+</head>
+<body>
+  <div class="header">Azure Billing Processor</div>
+  <div class="layout-container">
+    {% include 'sidebar.html' %}
+    <div class="content-area">
+      <div class="main-content">
+        {% block content %}{% endblock %}
+      </div>
+      <div class="info-box">
+        {% block info %}
+        <h3>What this step does</h3>
+        <p>This page allows you to specify the billing type (EA, CSP, PAYG) and upload your raw billing CSV file. Once uploaded, the system will begin parsing and analyzing the input to prepare it for Azure Pricing API enrichment.</p>
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

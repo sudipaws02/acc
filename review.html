@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Review & Execute{% endblock %}
+{% block content %}
+<h2>Step 5: Review Configuration</h2>
+<p class="description">Here is a summary of your configuration. Please confirm everything is correct before execution.</p>
+<ul>
+  <li>Billing Type: EA</li>
+  <li>Uploaded File: billing_data.csv</li>
+  <li>Mapped Columns: productId → Column1, skuId → Column2</li>
+  <li>Selected Filters: productId, skuId, armRegionName, priceType</li>
+  <li>Threads: 4, Retries: 3</li>
+</ul>
+<form action="/execute" method="post">
+  <div class="navigation-buttons align-right">
+    <a href="/run-specs" class="button previous">Previous</a>
+    <button type="submit">Execute</button>
+  </div>
+</form>
+{% endblock %}
+{% block info %}
+<h3>Final Checkpoint</h3>
+<p>Ensure that your settings reflect the actual input. Once executed, the tool will fetch data from Azure Pricing API and perform delta calculations based on the matched pricing information.</p>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Billing Type{% endblock %}
+{% block content %}
+<h2>Billing Type & File Upload</h2>
+<p class="description">Please select the billing type that matches your Azure subscription and upload your billing CSV file for processing. This is the first step in enriching your data with Azure Retail Pricing.</p>
+<form action="/column-map" method="post" enctype="multipart/form-data">
+  <label>Billing Type:</label><br>
+  <input type="radio" name="billing_type" value="EA"> EA
+  <input type="radio" name="billing_type" value="CSP"> CSP
+  <input type="radio" name="billing_type" value="PAYG"> PAYG
+  <br><br>
+  <label>Upload Billing CSV:</label>
+  <input type="file" name="billing_file" accept=".csv">
+  <br><br>
+  <div class="navigation-buttons align-right">
+	<button type="submit">Next</button>
+  </div>
+</form>
+{% endblock %}
