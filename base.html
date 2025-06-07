@@ -6,7 +6,23 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style1.css') }}">
 </head>
 <body>
-  <div class="header">Azure Billing Processor</div>
+  <div class="top-header">
+  <div class="header-left">
+    <span class="app-title">Azure Billing Accelerator</span>
+  </div>
+  <div class="header-right">
+  <div class="header-section">
+    <img src="{{ url_for('static', filename='images/profile-user.png') }}" alt="User" class="icon" />
+    <span class="username">{{ username }}John Doe</span>
+  </div>
+  <div class="header-section">
+    <a href="/" class="logout-link">
+      <img src="{{ url_for('static', filename='images/logout.png') }}" alt="Logout" class="icon" />
+      Logout
+    </a>
+  </div>
+</div>
+</div>
   <div class="layout-container">
     {% include 'sidebar.html' %}
     <div class="content-area">

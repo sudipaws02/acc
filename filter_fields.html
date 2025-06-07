@@ -1,22 +1,73 @@
 {% extends 'base.html' %}
 {% block title %}Filter Fields{% endblock %}
 {% block content %}
-<h2>Step 3: Filter Fields Selection</h2>
-<p class="description">Select which fields to use as filters when querying the Azure Pricing API. The more precise the selection, the better the match.</p>
-<form action="/run-specs" method="post">
-  <ul>
-    <li><input type="checkbox" name="filters" value="productId"> productId</li>
-    <li><input type="checkbox" name="filters" value="skuId"> skuId</li>
-    <li><input type="checkbox" name="filters" value="armRegionName"> armRegionName</li>
-    <li><input type="checkbox" name="filters" value="priceType"> priceType</li>
-  </ul>
+
+<h2>Step 3: Choose Filter Fields</h2>
+<p class="description">Specify which fields you want to use when calling the Azure Retail Prices API. Choose either a recommended set or select fields manually.</p>
+
+<form method="post" action="/run-specs">
+  <div class="radio-selection">
+    <label><input type="radio" name="filterMode" value="custom" onclick="toggleFieldSelection()" checked> Custom</label>
+    <label><input type="radio" name="filterMode" value="recommended" onclick="toggleFieldSelection()"> Recommended</label>
+  </div>
+
+  <div id="filterFields" class="filter-grid">
+    <!-- Mandatory fields (always checked and disabled) -->
+    <div class="filter-field">
+      <label><input type="checkbox" name="filters" value="Location" checked disabled> Location</label>
+    </div>
+    <div class="filter-field">
+      <label><input type="checkbox" name="filters" value="priceType" checked disabled> Price Type</label>
+    </div>
+
+    <!-- Custom filter fields -->
+    {% set filters = [
+      "productId", "skuId", "armRegionName", "productName", "skuName", "serviceName", "meterId", 
+      "meterName", "armSkuName", "serviceFamily", "serviceId"
+    ] %}
+    {% for field in filters %}
+    <div class="filter-field">
+      <label>
+        <input type="checkbox" name="filters" value="{{ field }}" id="{{ field }}">
+        {{ field }}
+      </label>
+    </div>
+    {% endfor %}
+  </div>
+	<div class="currency-selection">
+  <label for="currency">Currency:</label>
+  <select name="currency" id="currency">
+    <option value="USD">🇺🇸 USD - US Dollar ($)</option>
+    <option value="INR">🇮🇳 INR - Indian Rupee (₹)</option>
+    <option value="EUR">🇪🇺 EUR - Euro (€)</option>
+    <option value="GBP">🇬🇧 GBP - British Pound (£)</option>
+    <option value="JPY">🇯🇵 JPY - Japanese Yen (¥)</option>
+    <option value="AUD">🇦🇺 AUD - Australian Dollar (A$)</option>
+  </select>
+</div>
+
   <div class="navigation-buttons align-right">
-    <a href="/column-map" class="button previous">Previous</a>
-    <button type="submit">Next</button>
+    <button type="submit" class="button previous">Previous</button>
+    <button type="submit" class="button">Configure Run Specs &#129154;</button>
   </div>
 </form>
+
+<script>
+function toggleFieldSelection() {
+  const isRecommended = document.querySelector('input[name="filterMode"]:checked').value === 'recommended';
+  const recommendedFields = ["meterId", "productId", "skuId", "serviceFamily"];
+
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    if (!cb.disabled) {
+      cb.checked = isRecommended ? recommendedFields.includes(cb.value) : false;
+    }
+  });
+}
+</script>
+
 {% endblock %}
+
 {% block info %}
-<h3>Filter Field Guidance</h3>
-<p>Choosing the right filters narrows down the Azure pricing API response, improving performance and accuracy of price matches.</p>
+<h3>Filter Field Details</h3>
+<p>The filter fields selected here will determine how Azure retail pricing data is fetched for each record. Selecting more fields generally improves precision but may reduce matching rate.</p>
 {% endblock %}

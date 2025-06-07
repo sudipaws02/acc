@@ -4,17 +4,39 @@
 <h2>Step 4: Run Specifications</h2>
 <p class="description">Specify execution parameters such as thread count and retry behavior when encountering API rate limits (429 errors).</p>
 <form action="/review" method="post">
+	<div class="url-selector">
+  <label><strong>Choose API Endpoint:</strong></label><br>
+  <label><input type="radio" name="apiMode" value="stable" onclick="updateApiUrl()" checked> Azure Pricing API</label>
+  <label><input type="radio" name="apiMode" value="preview" onclick="updateApiUrl()"> 2023-01-01-Preview</label>
+
+  <div style="margin-top: 10px;">
+    <!-- <label for="apiUrl">Selected URL:</label> -->
+    <input type="text" id="apiUrl" name="apiUrl" readonly value="https://prices.azure.com/api/retail/prices">
+  </div>
+</div>
+
   <label for="threads">Number of Threads:</label>
   <input type="number" id="threads" name="threads" value="4" min="1" max="50">
   <br>
-  <label for="retries">Retry Attempts for 429:</label>
+  <label for="retries">Retry Attempts for HTTP Error 429:</label>
   <input type="number" id="retries" name="retries" value="3" min="0" max="10">
   <br>
   <div class="navigation-buttons align-right">
-    <a href="/filter-fields" class="button previous">Previous</a>
-    <button type="submit">Next</button>
+    <button type="submit" class="button previous">Previous</button>
+    <button type="submit">Review &#129154;</button>
   </div>
 </form>
+<script>
+function updateApiUrl() {
+  const selected = document.querySelector('input[name="apiMode"]:checked').value;
+  const urlField = document.getElementById('apiUrl');
+  if (selected === "preview") {
+    urlField.value = "https://prices.azure.com/api/retail/prices?api-version=2023-01-01-preview";
+  } else {
+    urlField.value = "https://prices.azure.com/api/retail/prices";
+  }
+}
+</script>
 {% endblock %}
 {% block info %}
 <h3>Execution Settings</h3>

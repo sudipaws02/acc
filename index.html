@@ -1,19 +1,191 @@
-{% extends 'base.html' %}
-{% block title %}Billing Type{% endblock %}
-{% block content %}
-<h2>Billing Type & File Upload</h2>
-<p class="description">Please select the billing type that matches your Azure subscription and upload your billing CSV file for processing. This is the first step in enriching your data with Azure Retail Pricing.</p>
-<form action="/column-map" method="post" enctype="multipart/form-data">
-  <label>Billing Type:</label><br>
-  <input type="radio" name="billing_type" value="EA"> EA
-  <input type="radio" name="billing_type" value="CSP"> CSP
-  <input type="radio" name="billing_type" value="PAYG"> PAYG
-  <br><br>
-  <label>Upload Billing CSV:</label>
-  <input type="file" name="billing_file" accept=".csv">
-  <br><br>
-  <div class="navigation-buttons align-right">
-	<button type="submit">Next</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign in - Azure Billing Accelerator</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at bottom left, #ffd500 0%, #005a9e 45%, #002d60 100%);
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    .login-wrapper {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .login-logo {
+      height: 32px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      background-color: white;
+      padding: 40px 30px;
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px #ccc, 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-heading {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: #1b1a19;
+      text-align: left;
+    }
+
+    .login-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1b1a19;
+      text-align: left;
+      margin-bottom: 4px;
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      color: #605e5c;
+      text-align: left;
+      margin-bottom: 30px;
+	  margin-top: 0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 14px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #8a8886;
+      border-radius: 2px;
+      font-size: 14px;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .options input {
+      margin-right: 5px;
+    }
+
+    .link {
+      color: #0078d4;
+      text-decoration: none;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+
+    .button {
+      width: 100%;
+      padding: 10px;
+      background-color: #0078d4;
+      color: white;
+      font-size: 15px;
+      font-weight: 500;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .button:hover {
+      background-color: #005a9e;
+    }
+
+    .alt-login {
+      margin-top: 15px;
+      background-color: white;
+      width: 100%;
+      padding: 2px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background-color 0.2s ease;
+    }
+
+    .alt-login img {
+      height: 30px;
+      margin-right: 10px;
+    }
+
+    .alt-login:hover {
+      background-color: #f3f2f1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-wrapper">
+    <!-- <div class="logo-container"> -->
+      
+    <!-- </div> -->
+
+    <form class="login-container" action="{{ url_for('home') }}" method="get">
+      <div class="form-heading">
+	  <img src="{{ url_for('static', filename='images/LTIMindtree_Linear_2-1-LT-Blue.png') }}" alt="Azure Logo" class="login-logo"><br>
+	  <p style="margin: 0; margin-top: 5px; border-top: solid 1px #dbd9d9; padding-top: 5px; font-family: Helvetica, Arial, sans-serif;"><i>Azure Billing Accelerator</i></p></div>
+
+      <div class="login-title">Sign in</div>
+      <p class="login-subtitle">to continue to Azure Billing Accelerator</p>
+
+      <div class="form-group">
+        <label for="email">Email or username</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+
+      <div class="options">
+        <label><input type="checkbox" name="remember"> Stay signed in</label>
+        <a href="#" class="link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="button">Sign in</button>
+
+      <div class="alt-login" onclick="alert('Outlook login not yet implemented')">
+        <img src="{{ url_for('static', filename='images/email.png') }}" alt="Outlook">
+        Sign in using Outlook
+      </div>
+    </form>
   </div>
-</form>
-{% endblock %}
+
+</body>
+</html>

@@ -3,19 +3,51 @@
 {% block content %}
 <h2>Step 5: Review Configuration</h2>
 <p class="description">Here is a summary of your configuration. Please confirm everything is correct before execution.</p>
-<ul>
-  <li>Billing Type: EA</li>
-  <li>Uploaded File: billing_data.csv</li>
-  <li>Mapped Columns: productId → Column1, skuId → Column2</li>
-  <li>Selected Filters: productId, skuId, armRegionName, priceType</li>
-  <li>Threads: 4, Retries: 3</li>
-</ul>
+
+<div class="review-section">
+  <div class="review-block">
+    <h3>Billing Type</h3>
+    <p>EA</p>
+  </div>
+
+  <div class="review-block">
+    <h3>Uploaded File</h3>
+    <p>billing_data.csv</p>
+  </div>
+
+  <div class="review-block">
+    <h3>Mapped Columns</h3>
+    <ul>
+      <li><strong>productId</strong> → Column1</li>
+      <li><strong>skuId</strong> → Column2</li>
+    </ul>
+  </div>
+
+  <div class="review-block">
+    <h3>Selected Filters</h3>
+    <ul class="filter-tags">
+      <li>productId</li>
+      <li>skuId</li>
+      <li>armRegionName</li>
+      <li>priceType</li>
+	  <li>currency: USD</li>
+    </ul>
+  </div>
+
+  <div class="review-block">
+    <h3>Execution Parameters</h3>
+    <p><strong>Threads:</strong> 4<br><strong>Retries:</strong> 3</p>
+	<p><strong>API URL:</strong> https://prices.azure.com/api/retail/prices</p>
+  </div>
+</div>
+
 <form action="/execute" method="post">
   <div class="navigation-buttons align-right">
-    <a href="/run-specs" class="button previous">Previous</a>
-    <button type="submit">Execute</button>
+    <button type="submit" class="button previous">Previous</button>
+    <button type="submit" class="button">Execute</button>
   </div>
 </form>
+
 {% endblock %}
 {% block info %}
 <h3>Final Checkpoint</h3>

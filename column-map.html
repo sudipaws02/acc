@@ -1,79 +1,112 @@
 {% extends 'base.html' %}
 {% block title %}Column Mapping{% endblock %}
 {% block content %}
-<h2>Step 2: Column Mapping</h2>
-<p class="description">Map each column from your uploaded billing file to one of the Azure Pricing API filter fields. If a column does not match, select "Custom" or retain the original name.</p>
-<form action="/filter-fields" method="post">
-  <table class="compact-table">
+
+<h2>Step 2: Select Mapping Method</h2>
+<p class="description">Choose how you want to define the column mappings for the Azure Pricing API call.</p>
+
+<form>
+  <label><input type="radio" name="mapMethod" value="yaml" onclick="toggleMappingForm()"> YAML Inline Editor</label><br>
+  <label><input type="radio" name="mapMethod" value="mapper" onclick="toggleMappingForm()"> Column Mapper</label>
+</form>
+
+<!-- YAML Form -->
+<div id="yamlForm" class="yaml-form" style="display: none;">
+  <form action="/filter-fields" method="post">
+    <label for="yamlInput">Paste your YAML mapping here:</label><br>
+    <textarea name="yamlInput" id="yamlInput" rows="10" class="yaml-input"></textarea>
+    <div class="navigation-buttons align-right">
+      <button type="submit" class="button previous">Previous</button>
+      <button type="submit" class="button">Select Filter Fields &#129154;</button>
+    </div>
+  </form>
+</div>
+
+<!-- Column Mapper Form (flex layout) -->
+<div id="columnForm" class="column-form" style="display: none;">
+  <form action="/filter-fields" method="post">
+    {% for i in range(1, 7) %}
+    <div class="map-row">
+      <div class="col-label">Column{{ i }}</div>
+      <div class="col-controls">
+        <select name="mapping{{ i }}" onchange="toggleCustomFields(this, {{ i }})" class="map-select">
+          <option value="">-- Select --</option>
+          <option value="productId">productId</option>
+          <option value="skuId">skuId</option>
+          <option value="armRegionName">armRegionName</option>
+          <option value="productName">productName</option>
+          <option value="skuName">skuName</option>
+          <option value="serviceName">serviceName</option>
+          <option value="meterId">meterId</option>
+          <option value="meterName">meterName</option>
+          <option value="location">location</option>
+          <option value="armSkuName">armSkuName</option>
+          <option value="serviceFamily">serviceFamily</option>
+          <option value="serviceId">serviceId</option>
+          <option value="Custom">Custom</option>
+        </select>
+        <div id="customBlock{{ i }}" class="custom-block" style="display: none;">
+          <input type="text" name="customName{{ i }}" placeholder="Enter custom name" class="custom-input">
+          <label class="default-label">
+            <input type="checkbox" name="useCustom{{ i }}"> Default?
+          </label>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <div class="navigation-buttons align-right">
+      <button type="submit" class="button previous">Previous</button>
+      <button type="submit" class="button">Select Filter Fields &#129154;</button>
+    </div>
+  </form>
+</div>
+
+<!-- Sample Table -->
+<h3>Sample Input Preview</h3>
+<div class="sample-scroll">
+  <table class="sample-table">
     <thead>
       <tr>
-        <th>Column Name</th>
-        <th>Map To</th>
-        <th>Keep Original?</th>
+        {% for col in range(1, 13) %}
+        <th>Col {{ col }}</th>
+        {% endfor %}
       </tr>
     </thead>
     <tbody>
-      {% for i in range(1, 7) %}
+      {% for row in range(1, 4) %}
       <tr>
-        <td>Column{{ i }}</td>
-        <td>
-          <select name="mapping{{ i }}" onchange="toggleCustomInput(this, {{ i }})">
-            <option value="">-- Select --</option>
-            <option value="productId">productId</option>
-            <option value="skuId">skuId</option>
-            <option value="armRegionName">armRegionName</option>
-            <option value="productName">productName</option>
-            <option value="skuName">skuName</option>
-            <option value="serviceName">serviceName</option>
-            <option value="meterId">meterId</option>
-            <option value="meterName">meterName</option>
-            <option value="location">location</option>
-            <option value="armSkuName">armSkuName</option>
-            <option value="serviceFamily">serviceFamily</option>
-            <option value="serviceId">serviceId</option>
-            <option value="Custom">Custom</option>
-          </select>
-        </td>
-        <td>
-  <div>
-    <label><input type="checkbox" name="keep{{ i }}"> Keep Original</label><br>
-    <input type="text" name="custom{{ i }}" id="custom{{ i }}" placeholder="Enter custom name"
-           style="display:none; margin-top: 4px; width: 90%;" />
-  </div>
-</td>
+        {% for col in range(1, 13) %}
+        <td>R{{ row }}C{{ col }}</td>
+        {% endfor %}
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <div class="navigation-buttons align-right">
-    <a href="/" class="button previous">Previous</a>
-    <button type="submit" class="button">Next</button>
-  </div>
-</form>
-<h3>Sample Input Preview</h3>
-<table class="compact-table">
-  <thead>
-    <tr><th>Column A</th><th>Column B</th><th>Column C</th><th>Column D</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>data1</td><td>value1</td><td>info1</td><td>extra1</td></tr>
-    <tr><td>data2</td><td>value2</td><td>info2</td><td>extra2</td></tr>
-    <tr><td>data3</td><td>value3</td><td>info3</td><td>extra3</td></tr>
-  </tbody>
-</table>
+</div>
+
 <script>
-function toggleCustomInput(selectElement, rowIndex) {
-  const customInput = document.getElementById(`custom${rowIndex}`);
-  if (selectElement.value === 'Custom') {
-    customInput.style.display = 'block';
+function toggleMappingForm() {
+  const method = document.querySelector('input[name="mapMethod"]:checked')?.value;
+  document.getElementById('yamlForm').style.display = (method === 'yaml') ? 'block' : 'none';
+  document.getElementById('columnForm').style.display = (method === 'mapper') ? 'block' : 'none';
+}
+
+function toggleCustomFields(selectEl, index) {
+  const customBlock = document.getElementById(`customBlock${index}`);
+  if (selectEl.value === 'Custom') {
+    customBlock.style.display = 'flex';
   } else {
-    customInput.style.display = 'none';
-    customInput.value = '';
+    customBlock.style.display = 'none';
+    customBlock.querySelector('input[type="text"]').value = '';
+    customBlock.querySelector('input[type="checkbox"]').checked = false;
   }
 }
 </script>
+
 {% endblock %}
+
 {% block info %}
-<h3>Column Mapping Details</h3>
-<p>This step helps ensure that your billing data fields are correctly aligned with the Azure API filters, which improves accuracy in API enrichment.</p>
+<h3>Mapping Options</h3>
+<p><strong>YAML Inline Editor:</strong> Paste structured mappings directly as YAML.</p>
+<p><strong>Column Mapper:</strong> Use dropdowns and custom fields to visually configure mappings.</p>
 {% endblock %}
