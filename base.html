@@ -8,6 +8,7 @@
 <body>
   <div class="top-header">
   <div class="header-left">
+  <img class="header-left-logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
     <span class="app-title">Azure Billing Accelerator</span>
   </div>
   <div class="header-right">
@@ -24,7 +25,9 @@
 </div>
 </div>
   <div class="layout-container">
-    {% include 'sidebar.html' %}
+    {% block sidebar %}
+      {% include 'sidebar.html' %}
+    {% endblock %}
     <div class="content-area">
       <div class="main-content">
         {% block content %}{% endblock %}

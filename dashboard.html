@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block sidebar %}
+  {% include 'dashboard-sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="main-content">
+    <h2 class="dashboard-title">Welcome to Azure Billing Accelerator</h2>
+    <p class="dashboard-description">
+      This tool helps you analyze Azure billing data and match it with the Azure Retail Prices API.
+      You can configure filter fields, map columns, and execute pricing calculations with cost delta insights.
+    </p>
+    <p>This dashboard gives you access to auxiliary features of the Azure Billing Accelerator.</p>
+    <ul>
+      <li>Manage previous executions</li>
+      <li>Define reusable configuration sets</li>
+      <li>Generate custom YAML config files</li>
+      <li>Preview and test filter field selections</li>
+    </ul>
+    <br>
+    <a href="/home" class="action-button">Fetch Retail Prices</a>
+  </div>
+
+{% endblock %}
+{% block info %}
+<h3>Execution Settings</h3>
+<p>YTD what to put here.</p>
+{% endblock %}

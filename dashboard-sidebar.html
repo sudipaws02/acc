@@ -1,0 +1,9 @@
+<div class="sidebar">
+  <h3>Tool Menu</h3>
+  <ul>
+    <li><a href="/executions" class="{% if request.path == '/executions' %}active{% endif %}">Executions</a></li>
+    <!-- <li><a href="/default-config" class="{% if request.path == '/default-config' %}active{% endif %}">Set Default Configurations</a></li> -->
+    <li><a href="/generate-config" class="{% if request.path == '/generate-config' %}active{% endif %}">Generate Config YAML</a></li>
+    <li><a href="/filter-fields-info" class="{% if request.path == '/filter-fields-info' %}active{% endif %}">Filter Fields Info</a></li>
+  </ul>
+</div>
